@@ -59,7 +59,7 @@ public class GridMover : MonoBehaviour
         {
             player.position = _currentTile.position;
             _isMoving = false;
-            //Debug.Log(currentTile.position);
+            MatchRotationToTile();
         }
     }
 
@@ -116,6 +116,14 @@ public class GridMover : MonoBehaviour
         foreach (GameObject tile in switchTiles)
         {
             tiles.Add(tile.transform);
+        }
+    }
+    
+    public void MatchRotationToTile()
+    {
+        if (_currentTile != null)
+        {
+            transform.rotation = _currentTile.rotation; // Match the player's rotation to the tile
         }
     }
 }

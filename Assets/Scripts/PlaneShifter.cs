@@ -6,15 +6,15 @@ public class PlaneShifter : MonoBehaviour
     public Transform worldContainer; // The parent object containing all tiles and world elements
     public Transform player;
     public Transform[] planeOrigins; // Positions that represent different plane alignments
-    private int currentPlaneIndex;
+    private int _currentPlaneIndex;
     public float shiftSpeed = 2f;
-    private bool isShifting;
-    private bool canShift = false; // Tracks if the player is on a PlaneSwitch tile
-    private Transform currentSwitchTile; // Stores the current PlaneSwitch tile
+    private bool _isShifting;
+    private bool _canShift; // Tracks if the player is on a PlaneSwitch tile
+    private Transform _currentSwitchTile; // Stores the current PlaneSwitch tile
 
     void Update()
     {
-        if (!isShifting)
+        if (!_isShifting)
         {
             DetectPlaneSwitch();
             HandlePlaneShiftInput();
@@ -31,20 +31,21 @@ public class PlaneShifter : MonoBehaviour
         {
             if (hit.CompareTag("PlaneSwitch") && Vector3.Distance(hit.transform.position, player.position) < 1f)
             {
-                canShift = true;
-                currentSwitchTile = hit.transform;
+                _canShift = true;
+                _currentSwitchTile = hit.transform;
                 return; // Stop checking after finding a valid tile
+                
             }
         }
 
         // If no exact match was found, reset canShift
-        canShift = false;
-        currentSwitchTile = null;
+        _canShift = false;
+        _currentSwitchTile = null;
     }
 
     void HandlePlaneShiftInput()
     {
-        if (canShift && !isShifting)
+        if (_canShift && !_isShifting)
         {
             if (Input.GetKeyDown(KeyCode.W)) ShiftPlane(Vector3.forward);
             if (Input.GetKeyDown(KeyCode.S)) ShiftPlane(Vector3.back);
@@ -55,16 +56,16 @@ public class PlaneShifter : MonoBehaviour
 
     void ShiftPlane(Vector3 direction)
     {
-        if (currentSwitchTile == null) return;
+        if (!_currentSwitchTile || _isShifting) return;
 
-        int newPlaneIndex = (currentPlaneIndex + 1) % planeOrigins.Length;
-        StartCoroutine(SmoothShift(newPlaneIndex, currentSwitchTile));
+        int newPlaneIndex = (_currentPlaneIndex + 1) % planeOrigins.Length;
+        StartCoroutine(SmoothShift(newPlaneIndex, _currentSwitchTile));
     }
 
     IEnumerator SmoothShift(int newPlaneIndex, Transform targetTile)
     {
-        isShifting = true;
-        canShift = false;
+        _isShifting = true;
+        _canShift = false;
         Vector3 startPosition = player.position;
         Quaternion startRotation = player.rotation;
         
@@ -84,7 +85,7 @@ public class PlaneShifter : MonoBehaviour
         player.position = targetPosition;
         player.rotation = targetRotation;
 
-        currentPlaneIndex = newPlaneIndex;
-        isShifting = false;
+        _currentPlaneIndex = newPlaneIndex;
+        _isShifting = false;
     }
 }
