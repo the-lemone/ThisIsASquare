@@ -4,9 +4,9 @@ using UnityEngine;
 public class GridMover : MonoBehaviour
 {
     public Transform player;
-    public float moveSpeed = 5f;
+    public float moveSpeed = 5f; // Used in MoveToTarget
     public List<Transform> tiles; // List of tile positions
-    private Transform _currentTile;
+    private Transform _currentTile; // Whatever tile the player is on right now
     private bool _isMoving;
 
     void Start()
@@ -71,10 +71,11 @@ public class GridMover : MonoBehaviour
         foreach (Transform tile in tiles)
         {
             Vector3 tileOffset = (tile.position - _currentTile.position).normalized;
-            
-            if (Vector3.Dot(tileOffset, direction.normalized) > 0.9f) // Ensure movement aligns with tile direction
+            float distance = Vector3.Distance(_currentTile.position + direction.normalized, tile.position);
+
+            if (Vector3.Dot(tileOffset, direction.normalized) > 0.9f && distance <= 1f) // Ensure movement aligns with tile direction
             {
-                float distance = Vector3.Distance(_currentTile.position + direction.normalized, tile.position);
+                //float distance = Vector3.Distance(_currentTile.position + direction.normalized, tile.position);
                 if (distance < minDistance)
                 {
                     minDistance = distance;
@@ -106,13 +107,13 @@ public class GridMover : MonoBehaviour
     void GetAllTiles()
     {
         tiles.Clear();
-        GameObject[] tileObjects = GameObject.FindGameObjectsWithTag("Tile");
+        GameObject[] tileObjects = GameObject.FindGameObjectsWithTag("NormalTile");
         foreach (GameObject tile in tileObjects)
         {
             tiles.Add(tile.transform);
         }
         
-        GameObject[] switchTiles = GameObject.FindGameObjectsWithTag("PlaneSwitch");
+        GameObject[] switchTiles = GameObject.FindGameObjectsWithTag("SwitchTile");
         foreach (GameObject tile in switchTiles)
         {
             tiles.Add(tile.transform);

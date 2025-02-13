@@ -4,8 +4,8 @@
 TagManager:
   serializedVersion: 3
   tags:
-  - Tile
-  - PlaneSwitch
+  - NormalTile
+  - SwitchTile
   layers:
   - Default
   - TransparentFX
