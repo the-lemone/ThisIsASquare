@@ -13,7 +13,6 @@ public class FadeOut : MonoBehaviour
     
     IEnumerator FadeScreen(float targetAlpha)
     {
-        Debug.Log("Coroutine started");
         float startAlpha = fadeCanvas.alpha;
         float elapsedTime = 0f;
 

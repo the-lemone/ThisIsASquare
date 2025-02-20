@@ -73,9 +73,8 @@ public class GridMover : MonoBehaviour
             Vector3 tileOffset = (tile.position - _currentTile.position).normalized;
             float distance = Vector3.Distance(_currentTile.position + direction.normalized, tile.position);
 
-            if (Vector3.Dot(tileOffset, direction.normalized) > 0.9f && distance <= 1f) // Ensure movement aligns with tile direction
+            if (Vector3.Dot(tileOffset, direction.normalized) > 0.9f && distance <= 0.8f) // Ensure movement aligns with tile direction
             {
-                //float distance = Vector3.Distance(_currentTile.position + direction.normalized, tile.position);
                 if (distance < minDistance)
                 {
                     minDistance = distance;
