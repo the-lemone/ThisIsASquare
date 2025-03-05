@@ -3,14 +3,20 @@ using UnityEngine;
 
 public class GridMover : MonoBehaviour
 {
+    private static readonly int MoveX = Animator.StringToHash("MoveX");
+    private static readonly int MoveY = Animator.StringToHash("MoveY");
+    private static readonly int IsMoving = Animator.StringToHash("IsMoving");
     public Transform player;
     public float moveSpeed = 5f; // Used in MoveToTarget
     public List<Transform> tiles; // List of tile positions
     private Transform _currentTile; // Whatever tile the player is on right now
     private bool _isMoving;
+    
+    private Animator _anim;
 
     void Start()
     {
+        _anim = GetComponent<Animator>();
         GetAllTiles();
         
         if (tiles.Count > 0)
@@ -22,6 +28,7 @@ public class GridMover : MonoBehaviour
 
     void Update()
     {
+        _anim.SetBool(IsMoving, _isMoving);
         if (!_isMoving)
         {
             HandleInput();
@@ -36,15 +43,15 @@ public class GridMover : MonoBehaviour
     {
         Vector3 inputDirection = Vector3.zero;
         
-        if (Input.GetKeyDown(KeyCode.W)) inputDirection = player.forward; // Move forward in 3D
-        if (Input.GetKeyDown(KeyCode.S)) inputDirection = -player.forward; // Move backward
-        if (Input.GetKeyDown(KeyCode.A)) inputDirection = -player.right; // Move left
-        if (Input.GetKeyDown(KeyCode.D)) inputDirection = player.right; // Move right
+        if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) inputDirection = player.forward; // Move forward in 3D
+        if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) inputDirection = -player.forward; // Move backward
+        if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) inputDirection = -player.right; // Move left
+        if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) inputDirection = player.right; // Move right
         
         if (inputDirection != Vector3.zero)
         {
             Transform targetTile = FindTileInDirection(inputDirection);
-            if (targetTile != null)
+            if (targetTile)
             {
                 _currentTile = targetTile;
                 _isMoving = true;
@@ -54,8 +61,9 @@ public class GridMover : MonoBehaviour
     
     void MoveToTarget()
     {
-        player.position = Vector3.MoveTowards(player.position, _currentTile.position, moveSpeed * Time.deltaTime);
-        if (Vector3.Distance(player.position, _currentTile.position) < 0.01f)
+        float distance = Vector3.Distance(player.position, _currentTile.position);
+        player.position = Vector3.MoveTowards(player.position, _currentTile.position, (moveSpeed * distance)/100);
+        if (distance < 0.01f)
         {
             player.position = _currentTile.position;
             _isMoving = false;
