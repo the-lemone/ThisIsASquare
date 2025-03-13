@@ -292,6 +292,7 @@ MonoBehaviour:
   player: {fileID: 4848118757264414698}
   moveSpeed: 3.4
   tiles: []
+  moveSound: {fileID: 8300000, guid: 20294f12d6c5b0849bc4ce0a827add25, type: 3}
 --- !u!114 &3724623564705789223
 MonoBehaviour:
   m_ObjectHideFlags: 0

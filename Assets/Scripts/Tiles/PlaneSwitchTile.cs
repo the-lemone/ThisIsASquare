@@ -15,9 +15,13 @@ public class PlaneSwitchTile : MonoBehaviour
     private Dictionary<KeyCode, Vector3> _shiftDirections = new Dictionary<KeyCode, Vector3>
     {
         { KeyCode.W, new Vector3(0, -0.5f, 0.5f) },  // Forward
-        { KeyCode.D, new Vector3(0.5f, -0.5f, 0) },  // Right
-        { KeyCode.S, new Vector3(0, -0.5f, -0.5f) }, // Backward
-        { KeyCode.A, new Vector3(-0.5f, -0.5f, 0) }  // Left
+        { KeyCode.UpArrow, new Vector3(0, -0.5f, 0.5f) },  // Forward (Arrow Up)
+        { KeyCode.D, new Vector3(0.5f, -0.5f, 0) },  // Right (D)
+        { KeyCode.RightArrow, new Vector3(0.5f, -0.5f, 0) },  // Right (Arrow Right)
+        { KeyCode.S, new Vector3(0, -0.5f, -0.5f) }, // Backward (S)
+        { KeyCode.DownArrow, new Vector3(0, -0.5f, -0.5f) }, // Backward (Arrow Down)
+        { KeyCode.A, new Vector3(-0.5f, -0.5f, 0) },  // Left (A)
+        { KeyCode.LeftArrow, new Vector3(-0.5f, -0.5f, 0) }  // Left (Arrow Left)
     };
 
     void Start()
@@ -29,7 +33,7 @@ public class PlaneSwitchTile : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            Debug.Log("Player On Tile");
+            //Debug.Log("Player On Tile");
             _playerOnTile = true;
             StartCoroutine(StartCooldown()); // Prevents immediate switching
             DetectAvailableShifts();

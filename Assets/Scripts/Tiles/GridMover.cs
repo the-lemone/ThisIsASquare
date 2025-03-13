@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class GridMover : MonoBehaviour
 {
@@ -11,8 +12,10 @@ public class GridMover : MonoBehaviour
     public List<Transform> tiles; // List of tile positions
     private Transform _currentTile; // Whatever tile the player is on right now
     private bool _isMoving;
+    private float _cooldown;
     
     private Animator _anim;
+    [SerializeField] private AudioClip moveSound;
 
     void Start()
     {
@@ -37,30 +40,41 @@ public class GridMover : MonoBehaviour
         {
             MoveToTarget();
         }
+
+        if (_cooldown > 0)
+        {
+            _cooldown -= Time.deltaTime;
+        }
+
+        if (_cooldown <= 0)
+            _cooldown = 0;
     }
     
     void HandleInput()
     {
         Vector3 inputDirection = Vector3.zero;
         
-        if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) inputDirection = player.forward; // Move forward in 3D
-        if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) inputDirection = -player.forward; // Move backward
-        if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) inputDirection = -player.right; // Move left
-        if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) inputDirection = player.right; // Move right
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)) inputDirection = player.forward; // Move forward in 3D
+        if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)) inputDirection = -player.forward; // Move backward
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)) inputDirection = -player.right; // Move left
+        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) inputDirection = player.right; // Move right
         
         if (inputDirection != Vector3.zero)
         {
             Transform targetTile = FindTileInDirection(inputDirection);
-            if (targetTile)
+            if (targetTile && _cooldown == 0)
             {
                 _currentTile = targetTile;
                 _isMoving = true;
+                _cooldown = 0.5f;
+                SoundFXManager.instance.PlaySoundMove(moveSound, transform, 1f);
             }
         }
     }
     
     void MoveToTarget()
     {
+        
         float distance = Vector3.Distance(player.position, _currentTile.position);
         player.position = Vector3.MoveTowards(player.position, _currentTile.position, (moveSpeed * distance)/100);
         if (distance < 0.01f)

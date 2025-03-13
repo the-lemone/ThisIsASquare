@@ -1,5 +1,4 @@
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -54,7 +53,6 @@ public class LevelTransitionTile : MonoBehaviour
     
     IEnumerator FadeScreen(float targetAlpha)
     {
-        Debug.Log("Coroutine started");
         float startAlpha = fadeCanvas.alpha;
         float elapsedTime = 0f;
 
