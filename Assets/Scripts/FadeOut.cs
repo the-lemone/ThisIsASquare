@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 public class FadeOut : MonoBehaviour
 {
     public float fadeDuration = 1f;

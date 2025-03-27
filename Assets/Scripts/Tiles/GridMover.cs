@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -27,6 +28,7 @@ public class GridMover : MonoBehaviour
             _currentTile = FindClosestTile(player.position);
             player.position = _currentTile.position;
         }
+        
     }
 
     void Update()
@@ -74,9 +76,14 @@ public class GridMover : MonoBehaviour
     
     void MoveToTarget()
     {
-        
         float distance = Vector3.Distance(player.position, _currentTile.position);
-        player.position = Vector3.MoveTowards(player.position, _currentTile.position, (moveSpeed * distance)/100);
+        
+        // Exponential movement factor
+        float t = 1f - Mathf.Exp(-moveSpeed * Time.deltaTime);
+        
+        // Smoothly interpolate player's position towards target
+        player.position = Vector3.Lerp(player.position, _currentTile.position, t);
+        //player.position = Vector3.MoveTowards(player.position, _currentTile.position, (moveSpeed * distance * Time.deltaTime));
         if (distance < 0.01f)
         {
             player.position = _currentTile.position;
