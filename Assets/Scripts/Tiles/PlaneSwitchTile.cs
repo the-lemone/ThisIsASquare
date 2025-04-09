@@ -107,7 +107,7 @@ public class PlaneSwitchTile : MonoBehaviour
             elapsedTime += Time.deltaTime * shiftSpeed;
             yield return null;
         }
-        //Debug.Log("Shifting finished");
+        
         _player.position = target.position;
         _player.rotation = targetRotation;
         _isShifting = false;

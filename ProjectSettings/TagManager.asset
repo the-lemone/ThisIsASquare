@@ -6,6 +6,7 @@ TagManager:
   tags:
   - NormalTile
   - SwitchTile
+  - Pivot
   layers:
   - Default
   - TransparentFX

@@ -15,7 +15,7 @@ public class SoundFXManager : MonoBehaviour
         DontDestroyOnLoad(this);
     }
 
-    public void PlaySoundMove(AudioClip clip, Transform spawnTransform, float volume)
+    public void PlaySoundMove(AudioClip clip, Transform spawnTransform, float volume, float pitch)
     {
         // spawn in game object
         AudioSource audioSource = Instantiate(soundMove, spawnTransform.position, Quaternion.identity);
@@ -25,6 +25,8 @@ public class SoundFXManager : MonoBehaviour
         
         // assign volume
         audioSource.volume = volume;
+        
+        audioSource.pitch = pitch;
         
         // play sound
         audioSource.Play();

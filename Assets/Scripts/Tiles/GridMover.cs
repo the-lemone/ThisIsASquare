@@ -8,13 +8,14 @@ public class GridMover : MonoBehaviour
     public float moveSpeed = 5f; // Used in MoveToTarget
     public List<Transform> tiles; // List of tile positions
     private Transform _currentTile; // Whatever tile the player is on right now
+    private bool _isMovingAnim;
     private bool _isMoving;
-    private bool _isMoving2;
     private float _cooldown;
     private int _timesMoved;
     
     private Animator _anim;
     [SerializeField] private AudioClip moveSound;
+    private float _pitch;
 
     void Start()
     {
@@ -26,21 +27,18 @@ public class GridMover : MonoBehaviour
             _currentTile = FindClosestTile(player.position);
             player.position = _currentTile.position;
         }
-        
     }
 
     void Update()
     {
-        _anim.SetBool(IsMoving, _isMoving);
-        if(!_isMoving2)
+        _anim.SetBool(IsMoving, _isMovingAnim);
+        if(!_isMoving)
             HandleInput();
-        else if (_isMoving2)
+        else if (_isMoving)
             MoveToTarget();
 
         if (_cooldown > 0)
-        {
             _cooldown -= Time.deltaTime;
-        }
 
         if (_cooldown <= 0)
             _cooldown = 0;
@@ -57,23 +55,24 @@ public class GridMover : MonoBehaviour
 
         if (inputDirection == Vector3.zero)
         {
-            _isMoving = false;
+            _isMovingAnim = false;
             _timesMoved = 0;
         }
         
         if (inputDirection != Vector3.zero)
         {
-            _isMoving = true;
+            _isMovingAnim = true;
             Transform targetTile = FindTileInDirection(inputDirection);
             if (targetTile && _cooldown == 0)
             {
                 _currentTile = targetTile;
-                _isMoving2 = true;
+                _isMoving = true;
                 _timesMoved++;
                 float cooldown = 0.5f - (_timesMoved * 0.1f);
                 float limit = Mathf.Clamp(cooldown, 0.01f, 0.5f);
                 _cooldown = limit;
-                SoundFXManager.instance.PlaySoundMove(moveSound, transform, 1f);
+                _pitch = 1f + _timesMoved * 0.05f;
+                SoundFXManager.instance.PlaySoundMove(moveSound, transform, 1f, _pitch);
             }
         }
     }
@@ -87,15 +86,12 @@ public class GridMover : MonoBehaviour
         
         // Smoothly interpolate player's position towards target
         player.position = Vector3.Lerp(player.position, _currentTile.position, t);
-        //player.position = Vector3.MoveTowards(player.position, _currentTile.position, (moveSpeed * distance * Time.deltaTime));
         if (distance < 0.01f)
         {
             player.position = _currentTile.position;
-            _isMoving2 = false;
+            _isMoving = false;
             MatchRotationToTile();
         }
-
-        //moveSpeed += 1;
     }
 
     Transform FindTileInDirection(Vector3 direction)
