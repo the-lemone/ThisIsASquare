@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5219946215066644615}
   - component: {fileID: 5878111424201278790}
   m_Layer: 0
-  m_Name: SoundMove
+  m_Name: SFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

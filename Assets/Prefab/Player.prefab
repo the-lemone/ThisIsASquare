@@ -30,7 +30,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4848118757264414698}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!1 &6029840925290879800
 GameObject:
   m_ObjectHideFlags: 0
@@ -44,7 +44,9 @@ GameObject:
   - component: {fileID: 4663356728670586311}
   - component: {fileID: 726341810591462872}
   - component: {fileID: 4110424356889230199}
-  - component: {fileID: 2135653707437737058}
+  - component: {fileID: 5022394480423701279}
+  - component: {fileID: 1966603237246683325}
+  - component: {fileID: 4396649318163760516}
   - component: {fileID: 3724623564705789223}
   - component: {fileID: 8619784218234915606}
   m_Layer: 0
@@ -171,7 +173,49 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 126
   m_CollisionDetection: 0
---- !u!114 &2135653707437737058
+--- !u!114 &5022394480423701279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6029840925290879800}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5855c6bf4ae9c904c8aeed19e0da79f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 4848118757264414698}
+  moveSound: {fileID: 8300000, guid: 20294f12d6c5b0849bc4ce0a827add25, type: 3}
+  bumpSound: {fileID: 8300000, guid: dd49fac69d6788044845023dd7afd35f, type: 3}
+  moveSpeed: 50
+  pitch: 0
+  tiles: []
+  currentTile: {fileID: 0}
+  isMovingAnim: 0
+  isMoving: 0
+--- !u!114 &1966603237246683325
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6029840925290879800}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0960fc7b2a72e1a4b9945be7f5fc090f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 4848118757264414698}
+  moveSound: {fileID: 8300000, guid: 20294f12d6c5b0849bc4ce0a827add25, type: 3}
+  bumpSound: {fileID: 8300000, guid: dd49fac69d6788044845023dd7afd35f, type: 3}
+  moveSpeed: 50
+  pitch: 0
+  tiles: []
+  currentTile: {fileID: 0}
+  isMovingAnim: 0
+  isMoving: 0
+--- !u!114 &4396649318163760516
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -180,13 +224,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 6029840925290879800}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: edde150e7cc7d6747876ba69f8d60b4a, type: 3}
+  m_Script: {fileID: 11500000, guid: 0dcd092feaca968469f90317e8b60993, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 4848118757264414698}
-  moveSpeed: 50
-  tiles: []
   moveSound: {fileID: 8300000, guid: 20294f12d6c5b0849bc4ce0a827add25, type: 3}
+  bumpSound: {fileID: 8300000, guid: dd49fac69d6788044845023dd7afd35f, type: 3}
+  moveSpeed: 5
+  pitch: 0
+  tiles: []
+  currentTile: {fileID: 0}
+  isMovingAnim: 0
+  isMoving: 0
+  acceleration: 10
+  deceleration: 10
 --- !u!114 &3724623564705789223
 MonoBehaviour:
   m_ObjectHideFlags: 0

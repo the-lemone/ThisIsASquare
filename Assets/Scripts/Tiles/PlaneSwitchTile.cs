@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class PlaneSwitchTile : MonoBehaviour
 {
-    public float shiftSpeed = 2f;
-    public float switchCooldown = 0.5f; // Cooldown duration before allowing switching
+    private const float ShiftSpeed = 5f;
+    private const float SwitchCooldown = 0.25f; // Cooldown duration before allowing switching
     private bool _playerOnTile; // bool for detecting if the player is on a switch tile, used in TriggerEnter/Exit and Update
-    private bool _isShifting; // used in Update, ShiftPlayer, and SmoothShift
+    public static bool isShifting; // used in Update, ShiftPlayer, and SmoothShift
     private bool _canShift; // Prevents instant triggering upon entry
     private Transform _player;
-    private Dictionary<KeyCode, Transform> _availableShifts = new Dictionary<KeyCode, Transform>();
+    private readonly Dictionary<KeyCode, Transform> _availableShifts = new Dictionary<KeyCode, Transform>();
     
-    private Dictionary<KeyCode, Vector3> _shiftDirections = new Dictionary<KeyCode, Vector3>
+    private readonly Dictionary<KeyCode, Vector3> _shiftDirections = new Dictionary<KeyCode, Vector3>
     {
         { KeyCode.W, new Vector3(0, -0.5f, 0.5f) },  // Forward
         { KeyCode.UpArrow, new Vector3(0, -0.5f, 0.5f) },  // Forward (Arrow Up)
@@ -51,11 +51,11 @@ public class PlaneSwitchTile : MonoBehaviour
 
     void Update()
     {
-        if (_playerOnTile && !_isShifting && _canShift)
+        if (_playerOnTile && !isShifting && _canShift)
         {
             foreach (var entry in _availableShifts)
             {
-                if (Input.GetKeyDown(entry.Key))
+                if (Input.GetKey(entry.Key))
                 {
                     ShiftPlayer(entry.Value);
                     break;
@@ -87,7 +87,7 @@ public class PlaneSwitchTile : MonoBehaviour
     void ShiftPlayer(Transform target)
     {
         if (!_player) return;
-        _isShifting = true;
+        isShifting = true;
         _canShift = false; // Prevent further inputs during shifting
         StartCoroutine(SmoothShift(target));
     }
@@ -104,18 +104,19 @@ public class PlaneSwitchTile : MonoBehaviour
         {
             _player.position = Vector3.Lerp(startPosition, target.position, elapsedTime);
             _player.rotation = Quaternion.Slerp(startRotation, targetRotation, elapsedTime);
-            elapsedTime += Time.deltaTime * shiftSpeed;
+            elapsedTime += Time.deltaTime * ShiftSpeed;
             yield return null;
         }
         
         _player.position = target.position;
         _player.rotation = targetRotation;
-        _isShifting = false;
+        yield return new WaitForSeconds(0.2f); // Small buffer after shift
+        isShifting = false;
     }
     
     IEnumerator StartCooldown()
     {
-        yield return new WaitForSeconds(switchCooldown);
+        yield return new WaitForSeconds(SwitchCooldown);
         _canShift = true;
     }
 }
