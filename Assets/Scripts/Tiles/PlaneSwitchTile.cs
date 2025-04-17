@@ -10,6 +10,7 @@ public class PlaneSwitchTile : MonoBehaviour
     public static bool isShifting; // used in Update, ShiftPlayer, and SmoothShift
     private bool _canShift; // Prevents instant triggering upon entry
     private Transform _player;
+    private bool _hasShiftedThisEntry;
     private readonly Dictionary<KeyCode, Transform> _availableShifts = new Dictionary<KeyCode, Transform>();
     
     private readonly Dictionary<KeyCode, Vector3> _shiftDirections = new Dictionary<KeyCode, Vector3>
@@ -33,8 +34,8 @@ public class PlaneSwitchTile : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            //Debug.Log("Player On Tile");
             _playerOnTile = true;
+            _hasShiftedThisEntry = false; // Reset when entering a new tile
             StartCoroutine(StartCooldown()); // Prevents immediate switching
             DetectAvailableShifts();
         }
@@ -46,17 +47,19 @@ public class PlaneSwitchTile : MonoBehaviour
         {
             _playerOnTile = false;
             _canShift = false; // Reset cooldown on exit
+            _hasShiftedThisEntry = false;
         }
     }
 
     void Update()
     {
-        if (_playerOnTile && !isShifting && _canShift)
+        if (_playerOnTile && !isShifting && _canShift && !_hasShiftedThisEntry)
         {
             foreach (var entry in _availableShifts)
             {
                 if (Input.GetKey(entry.Key))
                 {
+                    _hasShiftedThisEntry = true; // Lock this tile after one shift
                     ShiftPlayer(entry.Value);
                     break;
                 }
@@ -97,14 +100,16 @@ public class PlaneSwitchTile : MonoBehaviour
         Vector3 startPosition = _player.position;
         Quaternion startRotation = _player.rotation;
         Quaternion targetRotation = target.rotation; // Ensure player matches tile rotation
-        
+
+        float duration = 1f/ShiftSpeed;
         float elapsedTime = 0f;
         
-        while (elapsedTime < 1f)
+        while (elapsedTime < duration)
         {
-            _player.position = Vector3.Lerp(startPosition, target.position, elapsedTime);
-            _player.rotation = Quaternion.Slerp(startRotation, targetRotation, elapsedTime);
-            elapsedTime += Time.deltaTime * ShiftSpeed;
+            float t = elapsedTime / duration; // Normalized time from 0 to 1
+            _player.position = Vector3.Lerp(startPosition, target.position, t);
+            _player.rotation = Quaternion.Slerp(startRotation, targetRotation, t);
+            elapsedTime += Time.deltaTime;
             yield return null;
         }
         
@@ -118,5 +123,15 @@ public class PlaneSwitchTile : MonoBehaviour
     {
         yield return new WaitForSeconds(SwitchCooldown);
         _canShift = true;
+    }
+    
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.cyan;
+        foreach (var offset in _shiftDirections.Values)
+        {
+            Vector3 worldOffset = transform.TransformPoint(offset);
+            Gizmos.DrawWireSphere(worldOffset, 0.1f);
+        }
     }
 }
