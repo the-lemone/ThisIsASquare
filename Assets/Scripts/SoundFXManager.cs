@@ -1,4 +1,3 @@
-
 using UnityEngine;
 
 public class SoundFXManager : MonoBehaviour
@@ -11,8 +10,12 @@ public class SoundFXManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
+            DontDestroyOnLoad(gameObject);
         }
-        DontDestroyOnLoad(this);
+        else if (instance != this)
+        {
+            Destroy(gameObject); // destroy duplicate
+        }
     }
 
     public void PlaySoundMove(AudioClip clip, Transform spawnTransform, float volume, float pitch)

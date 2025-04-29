@@ -105,11 +105,20 @@ public class FreeMove : GridBase
                         SoundFXManager.instance.PlaySoundMove(bumpSound, transform, 1f, pitch);
                     _hasBumpedThisPress = true;
                 }
+                
+                Vector3 localVelocity = closestTile.InverseTransformDirection(_currentVelocity);
+
+                if (Mathf.Abs(localInputDir.x) > 0)
+                    localVelocity.x = 0f;
+                if (Mathf.Abs(localInputDir.z) > 0)
+                    localVelocity.z = 0f;
+
+                _currentVelocity = closestTile.TransformDirection(localVelocity);
+                
                 return;
             }
         }
         _hasBumpedThisPress = false;
-
         
         // Clamp for bounds regardless
         float maxOffset = 0.6f;

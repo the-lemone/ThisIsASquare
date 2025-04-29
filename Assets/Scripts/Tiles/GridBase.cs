@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
+using UnityEngine.SceneManagement;
 
 public class GridBase : MonoBehaviour
 {
@@ -16,7 +16,7 @@ public class GridBase : MonoBehaviour
     
     [HideInInspector]
     public float pitch;
-    [HideInInspector]
+    //[HideInInspector]
     public List<Transform> tiles; // List of tile positions
     [HideInInspector]
     public Transform currentTile; // Whatever tile the player is on right now
@@ -40,6 +40,16 @@ public class GridBase : MonoBehaviour
     protected virtual void Update()
     {
         _anim.SetBool(IsMoving, isMovingAnim);
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Backspace))
+        {
+            SceneManager.LoadScene("Level 0.1");
+        }
     }
 
     public Transform FindTileInDirection(Vector3 direction)
@@ -100,7 +110,7 @@ public class GridBase : MonoBehaviour
 
     protected void MatchRotationToTile()
     {
-        if (currentTile != null)
+        if (currentTile)
         {
             transform.rotation = currentTile.rotation; // Match the player's rotation to the tile
         }

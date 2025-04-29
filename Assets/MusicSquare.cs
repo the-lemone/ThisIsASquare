@@ -8,7 +8,11 @@ public class MusicSquare : MonoBehaviour
         if (instance == null)
         {
             instance = this;
+            DontDestroyOnLoad(gameObject);
         }
-        DontDestroyOnLoad(this);
+        else if (instance != this)
+        {
+            Destroy(gameObject); // destroy duplicate
+        }
     }
 }
