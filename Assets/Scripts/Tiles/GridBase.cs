@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class GridBase : MonoBehaviour
 {
@@ -40,16 +39,6 @@ public class GridBase : MonoBehaviour
     protected virtual void Update()
     {
         _anim.SetBool(IsMoving, isMovingAnim);
-
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            Application.Quit();
-        }
-
-        if (Input.GetKeyDown(KeyCode.Backspace))
-        {
-            SceneManager.LoadScene("Level 0.1");
-        }
     }
 
     public Transform FindTileInDirection(Vector3 direction)

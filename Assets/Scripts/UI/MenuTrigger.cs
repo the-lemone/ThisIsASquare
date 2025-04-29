@@ -8,7 +8,6 @@ public class MenuTrigger : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            //Debug.Log(other.gameObject.name);
             textMenu.SetActive(true);
         }
     }
