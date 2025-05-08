@@ -147,6 +147,12 @@ public class FreeMove : GridBase
     void SnapToNearestTile()
     {
         Transform closestTile = FindClosestTile(transform.position);
+
+        if (PlaneSwitchTile.isShifting)
+        {
+            closestTile = PlaneSwitchTile.currentTileMove;
+        }
+        
         if (closestTile)
         {
             var tileCenter = closestTile.position;

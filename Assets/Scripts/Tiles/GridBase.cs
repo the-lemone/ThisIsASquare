@@ -101,6 +101,12 @@ public class GridBase : MonoBehaviour
     {
         if (currentTile)
         {
+            if (PlaneSwitchTile.isShifting)
+            {
+                currentTile = PlaneSwitchTile.currentTileMove;
+                transform.rotation = PlaneSwitchTile.currentTileMove.rotation;
+                return;
+            }
             transform.rotation = currentTile.rotation; // Match the player's rotation to the tile
         }
     }

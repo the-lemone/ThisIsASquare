@@ -11,6 +11,8 @@ public class PlaneSwitchTile : MonoBehaviour
     private bool _canShift; // Prevents instant triggering upon entry
     private Transform _player;
     private bool _hasShiftedThisEntry;
+    public static Transform currentTileMove;
+    
     private readonly Dictionary<KeyCode, Transform> _availableShifts = new Dictionary<KeyCode, Transform>();
     
     private readonly Dictionary<KeyCode, Vector3> _shiftDirections = new Dictionary<KeyCode, Vector3>
@@ -92,6 +94,7 @@ public class PlaneSwitchTile : MonoBehaviour
         if (!_player) return;
         isShifting = true;
         _canShift = false; // Prevent further inputs during shifting
+        currentTileMove = target;
         StartCoroutine(SmoothShift(target));
     }
 
@@ -113,8 +116,6 @@ public class PlaneSwitchTile : MonoBehaviour
             yield return null;
         }
         
-        _player.position = target.position;
-        _player.rotation = targetRotation;
         yield return new WaitForSeconds(0.2f); // Small buffer after shift
         isShifting = false;
     }
@@ -123,15 +124,5 @@ public class PlaneSwitchTile : MonoBehaviour
     {
         yield return new WaitForSeconds(SwitchCooldown);
         _canShift = true;
-    }
-    
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.cyan;
-        foreach (var offset in _shiftDirections.Values)
-        {
-            Vector3 worldOffset = transform.TransformPoint(offset);
-            Gizmos.DrawWireSphere(worldOffset, 0.1f);
-        }
     }
 }

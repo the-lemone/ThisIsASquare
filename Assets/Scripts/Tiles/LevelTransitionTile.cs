@@ -31,7 +31,6 @@ public class LevelTransitionTile : MonoBehaviour
     void WinGame()
     {
         Debug.Log("Game Won!");
-        Application.Quit();
         // Add win logic here, such as showing a UI screen or triggering an event
     }
     
