@@ -6,8 +6,10 @@ public class TileQuit : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
+            #if UNITY_STANDALONE || UNITY_EDITOR
             Application.Quit();
             Debug.Log("Quit");
+            #endif
         }
     }
 }
