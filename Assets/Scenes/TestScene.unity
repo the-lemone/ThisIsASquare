@@ -794,9 +794,9 @@ GameObject:
   - component: {fileID: 353451396}
   - component: {fileID: 353451400}
   - component: {fileID: 353451395}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Player
-  m_TagString: Player
+  m_TagString: NormalTile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -813,6 +813,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e83311562ae9ac488d96f97805bf8cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moveSpeed: 5
+  rayDistance: 1
+  returnSpeed: 10
 --- !u!65 &353451396
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1523,7 +1526,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1157455426}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Pivot
   m_TagString: Pivot
   m_Icon: {fileID: 0}
