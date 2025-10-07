@@ -4,7 +4,7 @@ public class CameraFollow : MonoBehaviour
 {
     private Transform target;
     public float positionSmoothTime = 0.2f;
-    public float rotationSmoothTime = 0.5f;
+    public float rotationSmoothTime = 5f;
 
     private Vector3 velocity;
     
