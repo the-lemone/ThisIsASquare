@@ -1785,10 +1785,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e83311562ae9ac488d96f97805bf8cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 15
+  moveSpeed: 5
   tileSize: 1
-  acceleration: 60
-  deceleration: 60
+  acceleration: 15
+  deceleration: 15
   tileLayer:
     serializedVersion: 2
     m_Bits: 64

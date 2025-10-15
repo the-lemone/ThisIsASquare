@@ -56,44 +56,27 @@ public class Player : MonoBehaviour
                 Debug.Log("Self-destruct aborted!");
             }
         }
-        
-        Vector3 desiredVelocity = new Vector3(_moveInput.x, 0, _moveInput.z) * moveSpeed;
-        if (_moveInput.sqrMagnitude > 0.01f)
-        {
-            _velocity = Vector3.MoveTowards(_velocity, desiredVelocity, acceleration * Time.deltaTime);
-        }
-        else
-        {
-            _velocity = Vector3.MoveTowards(_velocity, desiredVelocity, deceleration * Time.deltaTime);
-        }
     }
 
     void FixedUpdate()
     {
-        if (_velocity != Vector3.zero) MovePlayer(_velocity);
-    }
-    
-    private void MovePlayer(Vector3 direction)
-    {
-        Vector3 move = direction * Time.fixedDeltaTime; // grid step per input
+        Vector3 desiredVelocity = new Vector3(_moveInput.x, 0, _moveInput.z) * moveSpeed;
+        float accel = (_moveInput.sqrMagnitude > 0.01f) ? acceleration : deceleration;
+        Vector3 targetVel = (_moveInput.sqrMagnitude > 0.01f) ? desiredVelocity : Vector3.zero;
+        
+        _velocity = Vector3.MoveTowards(_velocity, targetVel, accel * Time.fixedDeltaTime);
+        
+        // Predictive edge check
+        if (Mathf.Abs(_velocity.x) > 0.01f && !TileExistsAtOffset(new Vector3(Mathf.Sign(_velocity.x), 0, 0)))
+            _velocity.x = 0;
 
-        // Test X axis
-        if (Mathf.Abs(move.x) > 0.01f)
-        {
-            if (!TileExistsAtOffset(new Vector3(Mathf.Sign(move.x), 0, 0)))
-                move.x = 0;
-        }
-        // Test Z axis
-        if (Mathf.Abs(move.z) > 0.01f)
-        {
-            if (!TileExistsAtOffset(new Vector3(0, 0, Mathf.Sign(move.z))))
-                move.z = 0;
-        }
-    
+        if (Mathf.Abs(_velocity.z) > 0.01f && !TileExistsAtOffset(new Vector3(0, 0, Mathf.Sign(_velocity.z))))
+            _velocity.z = 0;
+        
         // Apply movement
-        Vector3 targetPos = _rb.position + move;
-        _rb.MovePosition(Vector3.Lerp(_rb.position, targetPos, moveSpeed * Time.fixedDeltaTime));
+        _rb.MovePosition(_rb.position + _velocity * Time.fixedDeltaTime);
     }
+    
     
     private bool TileExistsBelow() 
     {
@@ -109,13 +92,16 @@ public class Player : MonoBehaviour
     private bool TileExistsAtOffset(Vector3 offset) 
     {
         // Check for tile collider in the target cell
-        float offsetMultiplier = 0.75f; // Set to size of player
+        float offsetMultiplier = 0.6f; // Set to size of player
         Vector3 checkPos = transform.position + offset * tileSize;
         Vector3 halfExtents = transform.localScale * offsetMultiplier;
         Collider[] hits = Physics.OverlapBox(checkPos, halfExtents, Quaternion.identity, tileLayer);
-            hits = hits.Where(hit => { float angle = Quaternion.Angle(hit.transform.rotation, transform.rotation); 
-        return angle < 1f || Mathf.Abs(angle - 180f) < 1f; }).ToArray(); return hits.Length > 0;
-            
+            hits = hits.Where(hit =>
+            {
+                float angle = Vector3.Angle(hit.transform.up, hit.transform.up);
+                return angle < 1f;
+            }).ToArray();
+        return hits.Length > 0;
     }
     
     private IEnumerator SelfDestructSequence() 
