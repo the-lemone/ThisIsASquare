@@ -53,6 +53,7 @@ public class Player : MonoBehaviour
             {
                 StopCoroutine(_selfDestructRoutine);
                 _selfDestructRoutine = null;
+                FindFirstObjectByType<CameraFollow>().TriggerSelfDestructZoom(false); // Zoom out
                 Debug.Log("Self-destruct aborted!");
             }
         }
@@ -110,6 +111,8 @@ public class Player : MonoBehaviour
         float timer = 0f;
         float twitchTimer = 0f; 
         Debug.Log("Self-destruct initiated!");
+
+        FindFirstObjectByType<CameraFollow>().TriggerSelfDestructZoom(true); // Zoom in
         
         while (timer < duration && !_onTile) 
         { 
