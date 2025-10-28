@@ -11,15 +11,13 @@ public class CameraFollow : MonoBehaviour
     [Header("Dead Zone Settings")] [Range(0f, 0.5f)]
     [SerializeField] private float deadZoneX, deadZoneY, returnZonePadding;
 
-    [Header("Zoom Settings")]
-    [SerializeField] private Vector3 zoomedOffset = new Vector3(0, 5, 0);
-    [SerializeField] private float zoomSpeed;
+    [Header("Zoom Settings")] [SerializeField]
+    private float normalFOV, zoomedFOV, zoomDuration;
     
     private Camera cam;
     private bool isFollowingX;
     private bool isFollowingY;
 
-    private Vector3 currentOffset;
     private Coroutine zoomRoutine;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -32,7 +30,7 @@ public class CameraFollow : MonoBehaviour
         }
         
         cam = Camera.main;
-        currentOffset = offset;
+        cam.fieldOfView = normalFOV;
     }
 
     // Update is called once per frame
@@ -79,27 +77,52 @@ public class CameraFollow : MonoBehaviour
         transform.position = desiredPos;
     }
 
-    public void TriggerSelfDestructZoom(bool isActive)
+    public void TriggerSelfDestructZoom(bool zoomIn)
     {
-        Debug.Log("Triggered self-destruct zoom!");
         if (zoomRoutine != null)
             StopCoroutine(zoomRoutine);
 
-        zoomRoutine = StartCoroutine(SmoothZoom(isActive ? zoomedOffset : offset));
+        zoomRoutine = StartCoroutine(ZoomCoroutine(zoomIn));
     }
     
-    private IEnumerator SmoothZoom(Vector3 targetOffset)
+    private IEnumerator ZoomCoroutine(bool zoomIn)
     {
-        Vector3 startOffset = currentOffset;
-        float t = 0f;
-        
-        while (t < 1f)
+        float startFOV = cam.fieldOfView;
+        float endFOV = zoomIn ? zoomedFOV : normalFOV;
+        float elapsed = 0f;
+
+        while (elapsed < zoomDuration)
         {
-            t += Time.deltaTime * zoomSpeed;
-            currentOffset = Vector3.Lerp(startOffset, targetOffset, t);
+            elapsed += Time.deltaTime;
+            float t = elapsed / zoomDuration;
+            t = Mathf.SmoothStep(0f, 1f, t); // adds nice easing
+            cam.fieldOfView = Mathf.Lerp(startFOV, endFOV, t);
             yield return null;
         }
-        
-        currentOffset = targetOffset;
+
+        cam.fieldOfView = endFOV;
+        zoomRoutine = null;
+    }
+
+    public void ResetFOV(float duration)
+    {
+        StopAllCoroutines();
+        StartCoroutine(ResetFOVRoutine(duration));
+    }
+
+    private IEnumerator ResetFOVRoutine(float duration)
+    {
+        float startFOV = cam.fieldOfView;
+        float time = 0f;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            float t = time / duration;
+            cam.fieldOfView = Mathf.Lerp(startFOV, normalFOV, t);
+            yield return null;
+        }
+
+        cam.fieldOfView = normalFOV; // make sure it ends cleanly
     }
 }

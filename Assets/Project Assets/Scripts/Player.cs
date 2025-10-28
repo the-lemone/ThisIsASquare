@@ -24,6 +24,8 @@ public class Player : MonoBehaviour
     private Coroutine _selfDestructRoutine;
     private Vector3 _originalPosition;
     private bool _onTile = true;
+    
+    private CameraFollow _cameraFollow;
     void Awake()
     { 
         _controls = new PlayerControls(); // Subscribe to Move input
@@ -34,8 +36,12 @@ public class Player : MonoBehaviour
     }
     void OnEnable() => _controls.Enable();
     void OnDisable() => _controls.Disable();
-    
-    void Start() { _rb = GetComponent<Rigidbody>(); } 
+
+    void Start()
+    {
+        _cameraFollow = FindFirstObjectByType<CameraFollow>();
+        _rb = GetComponent<Rigidbody>();
+    } 
     void Update()
     { 
         bool tileBelow = TileExistsBelow(); // Transition from on-tile → off-tile
@@ -43,7 +49,9 @@ public class Player : MonoBehaviour
         {
             _onTile = false;
             if (_selfDestructRoutine == null)
-                _selfDestructRoutine = StartCoroutine(SelfDestructSequence()); 
+            {
+                _selfDestructRoutine = StartCoroutine(SelfDestructSequence());
+            }
         } 
         // Transition from off-tile → on-tile
         else if (tileBelow && !_onTile)
@@ -53,7 +61,7 @@ public class Player : MonoBehaviour
             {
                 StopCoroutine(_selfDestructRoutine);
                 _selfDestructRoutine = null;
-                FindFirstObjectByType<CameraFollow>().TriggerSelfDestructZoom(false); // Zoom out
+                _cameraFollow.TriggerSelfDestructZoom(false); // Zoom out
                 Debug.Log("Self-destruct aborted!");
             }
         }
@@ -109,10 +117,9 @@ public class Player : MonoBehaviour
     {
         _originalPosition = transform.position; float duration = twitchDuration;
         float timer = 0f;
-        float twitchTimer = 0f; 
-        Debug.Log("Self-destruct initiated!");
+        float twitchTimer = 0f;
 
-        FindFirstObjectByType<CameraFollow>().TriggerSelfDestructZoom(true); // Zoom in
+        _cameraFollow.TriggerSelfDestructZoom(true); // Zoom in
         
         while (timer < duration && !_onTile) 
         { 
@@ -140,7 +147,14 @@ public class Player : MonoBehaviour
         {
             Debug.Log("Player lost! Self-destruct complete.");
             // TODO: Add lose sequence or respawn logic here
+            Kill();
         }
         _selfDestructRoutine = null;
+    }
+
+    void Kill()
+    {
+        _cameraFollow.ResetFOV(0.5f);
+        gameObject.SetActive(false);
     }
 }

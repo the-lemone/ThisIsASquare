@@ -10,18 +10,42 @@ public class WorldController : MonoBehaviour
     private bool _isRotating;
 
     private PlayerControls _controls;
+    [SerializeField] private GameObject player;
+    
+    private bool canRotateHorizontal = false;
+    private bool canRotateVertical = false;
 
     void Awake()
     {
+#if UNITY_EDITOR
+        PlayerPrefs.DeleteAll();
+#endif
+        
         _controls = new PlayerControls();
 
         // Rotations around camera horizontal
-        _controls.Player.RotateLeft.performed += _ => TryRotate(-90f, cameraTransform.up);
-        _controls.Player.RotateRight.performed += _ => TryRotate(90f, cameraTransform.up);
+        _controls.Player.RotateLeft.performed += _ =>
+        {
+            if(canRotateHorizontal && gameObject.activeInHierarchy)
+                TryRotate(-90f, cameraTransform.up);
+        };
+        _controls.Player.RotateRight.performed += _ =>
+        {
+            if(canRotateHorizontal && gameObject.activeInHierarchy)
+                TryRotate(90f, cameraTransform.up);
+        };
         
         // Rotations around camera vertical
-        _controls.Player.RotateUp.performed += _ => TryRotate(-90f, cameraTransform.right);
-        _controls.Player.RotateDown.performed += _ => TryRotate(90f, cameraTransform.right);
+        _controls.Player.RotateUp.performed += _ =>
+        {
+            if(canRotateVertical && gameObject.activeInHierarchy)
+                TryRotate(-90f, cameraTransform.right);
+        };
+        _controls.Player.RotateDown.performed += _ =>
+        {
+            if(canRotateVertical && gameObject.activeInHierarchy)
+                TryRotate(90f, cameraTransform.right);
+        };
     }
     
     void OnEnable() => _controls.Enable();
@@ -32,6 +56,11 @@ public class WorldController : MonoBehaviour
         // Automatically assign main camera if not set in inspector
         if (cameraTransform == null)
             cameraTransform = Camera.main.transform;
+        if(player == null)
+            player = GameObject.FindGameObjectWithTag("Player");
+        
+        canRotateHorizontal = PlayerPrefs.GetInt("CanRotateHorizontal", 0) == 1;
+        canRotateVertical = PlayerPrefs.GetInt("CanRotateVertical", 0) == 1;
     }
     
     void Update()
@@ -48,7 +77,7 @@ public class WorldController : MonoBehaviour
     
     private void TryRotate(float angle, Vector3 axis)
     {
-        if(!_isRotating)
+        if (_isRotating || player == null || !player.activeInHierarchy) return;
             StartRotation(angle, axis);
     }
     
@@ -58,5 +87,19 @@ public class WorldController : MonoBehaviour
         _targetRotation = Quaternion.AngleAxis(angle, axis) * _startRotation;
         _t = 0f;
         _isRotating = true;
+    }
+    
+    public void UnlockHorizontalRotation()
+    { 
+        canRotateHorizontal = true;
+        PlayerPrefs.SetInt("CanRotateHorizontal", 1);
+        PlayerPrefs.Save();
+    }
+
+    public void UnlockVerticalRotation()
+    {
+        canRotateVertical = true;
+        PlayerPrefs.SetInt("CanRotateVerical", 1);
+        PlayerPrefs.Save();
     }
 }
