@@ -4,16 +4,18 @@ public class WorldController : MonoBehaviour
 {
     [SerializeField] private float rotateSpeed = 5f; // how fast rotation happens
     [SerializeField] private Transform cameraTransform; // reference to camera
+    [SerializeField] private Collider areaBounds; // Box collider defining control area
 
     private Quaternion _startRotation, _targetRotation;
     private float _t;
     private bool _isRotating;
+    private bool _isActive; // Only true if player is inside areaBounds
 
     private PlayerControls _controls;
     [SerializeField] private GameObject player;
     
-    private bool canRotateHorizontal = false;
-    private bool canRotateVertical = false;
+    private bool canRotateHorizontal;
+    private bool canRotateVertical;
 
     void Awake()
     {
@@ -56,8 +58,8 @@ public class WorldController : MonoBehaviour
         // Automatically assign main camera if not set in inspector
         if (cameraTransform == null)
             cameraTransform = Camera.main.transform;
-        if(player == null)
-            player = GameObject.FindGameObjectWithTag("Player");
+        if(areaBounds == null)
+            areaBounds = GetComponent<Collider>();
         
         canRotateHorizontal = PlayerPrefs.GetInt("CanRotateHorizontal", 0) == 1;
         canRotateVertical = PlayerPrefs.GetInt("CanRotateVertical", 0) == 1;
@@ -65,6 +67,8 @@ public class WorldController : MonoBehaviour
     
     void Update()
     {
+        if (!_isActive || !_isRotating) return;
+        
         if (_isRotating)
         {
             _t += Time.deltaTime * rotateSpeed;
@@ -77,7 +81,7 @@ public class WorldController : MonoBehaviour
     
     private void TryRotate(float angle, Vector3 axis)
     {
-        if (_isRotating || player == null || !player.activeInHierarchy) return;
+        if (_isRotating) return;
             StartRotation(angle, axis);
     }
     
@@ -87,6 +91,30 @@ public class WorldController : MonoBehaviour
         _targetRotation = Quaternion.AngleAxis(angle, axis) * _startRotation;
         _t = 0f;
         _isRotating = true;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            SetActive(true);
+            Debug.Log("Player entered");
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            SetActive(false);
+            Debug.Log("Player exited");
+        }
+    }
+    
+    public void SetActive(bool state)
+    {
+        _isActive = state;
+        
     }
     
     public void UnlockHorizontalRotation()

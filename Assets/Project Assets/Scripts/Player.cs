@@ -4,17 +4,22 @@ using UnityEngine;
 
 public class Player : MonoBehaviour 
 { 
-    [Header("Move/Tile Settings")]
+    [Header("Move Settings")]
     [SerializeField] private float moveSpeed;
-    [SerializeField] private float tileSize = 1f;
     [SerializeField] private float acceleration;
     [SerializeField] private float deceleration;
-    [SerializeField] private LayerMask tileLayer; // Layer for NormalTile
+    [SerializeField] private float bumpStrength;
     
     [Header("Self-Destruct Settings")]
     [SerializeField] private float twitchDuration;
     [SerializeField] private float twitchSpeed;
     [SerializeField] private float twitchIntensity;
+    
+    [Header("Layers")]
+    [SerializeField] private LayerMask tileLayer; // Layer for NormalTile
+    [SerializeField] private LayerMask wallLayer;
+    
+    private float tileSize = 1f;
     
     private Rigidbody _rb;
     private Vector3 _moveInput;
@@ -32,7 +37,6 @@ public class Player : MonoBehaviour
         _controls.Player.Move.performed += ctx => { Vector2 input = ctx.ReadValue<Vector2>();
             _moveInput = new Vector3(input.x, 0f, input.y); };
         _controls.Player.Move.canceled += _ => _moveInput = Vector3.zero;
-        
     }
     void OnEnable() => _controls.Enable();
     void OnDisable() => _controls.Disable();
@@ -75,17 +79,44 @@ public class Player : MonoBehaviour
         
         _velocity = Vector3.MoveTowards(_velocity, targetVel, accel * Time.fixedDeltaTime);
         
-        // Predictive edge check
-        if (Mathf.Abs(_velocity.x) > 0.01f && !TileExistsAtOffset(new Vector3(Mathf.Sign(_velocity.x), 0, 0)))
-            _velocity.x = 0;
+        // Wall
+        if (IsTouchingWall(out Vector3 wallNormal))
+        {
+            // Push the player slightly opposite to the wall normal
+            transform.position += wallNormal * (bumpStrength * Time.fixedDeltaTime);
 
-        if (Mathf.Abs(_velocity.z) > 0.01f && !TileExistsAtOffset(new Vector3(0, 0, Mathf.Sign(_velocity.z))))
-            _velocity.z = 0;
+            _velocity -= Vector3.Project(_velocity, -wallNormal);
+        }
         
         // Apply movement
         _rb.MovePosition(_rb.position + _velocity * Time.fixedDeltaTime);
     }
-    
+
+    private bool IsTouchingWall(out Vector3 wallNormal)
+    {
+        wallNormal = Vector3.zero;
+        float radius = 0.4f * tileSize;
+        Collider[] hits = Physics.OverlapSphere(transform.position, radius, wallLayer);
+
+        if (hits.Length > 0)
+        {
+            // Find average normal from all hit walls
+            Vector3 sumNormals = Vector3.zero;
+            foreach (var hit in hits)
+            {
+                if (hit.TryGetComponent(out Collider col))
+                {
+                    // Get closest point normal
+                    Vector3 dirToWall = (transform.position - col.ClosestPoint(transform.position));
+                    sumNormals += dirToWall;
+                }
+            }
+            
+            wallNormal = sumNormals.normalized;
+            return true;
+        }
+        return false;
+    }
     
     private bool TileExistsBelow() 
     {
@@ -96,21 +127,6 @@ public class Player : MonoBehaviour
             return true;
         }
         return false;
-    }
-    
-    private bool TileExistsAtOffset(Vector3 offset) 
-    {
-        // Check for tile collider in the target cell
-        float offsetMultiplier = 0.6f; // Set to size of player
-        Vector3 checkPos = transform.position + offset * tileSize;
-        Vector3 halfExtents = transform.localScale * offsetMultiplier;
-        Collider[] hits = Physics.OverlapBox(checkPos, halfExtents, Quaternion.identity, tileLayer);
-            hits = hits.Where(hit =>
-            {
-                float angle = Vector3.Angle(hit.transform.up, hit.transform.up);
-                return angle < 1f;
-            }).ToArray();
-        return hits.Length > 0;
     }
     
     private IEnumerator SelfDestructSequence() 
