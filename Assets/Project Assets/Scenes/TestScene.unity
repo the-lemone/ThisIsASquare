@@ -335,6 +335,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1157455426}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &18072877
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 18072879}
+  - component: {fileID: 18072878}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &18072878
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 18072877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffb3fa8c110a3ce40ba156a32f24d16e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &18072879
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 18072877}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &29149373
 GameObject:
   m_ObjectHideFlags: 0
@@ -2354,6 +2398,11 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 266012456}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &305561642 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2110332016921899392, guid: fd19e96146513934bb8b4aaabd2b0cef, type: 3}
+  m_PrefabInstance: {fileID: 5014122121606880246}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &327745365
 GameObject:
   m_ObjectHideFlags: 0
@@ -5531,9 +5580,9 @@ MonoBehaviour:
   target: {fileID: 170772541}
   offset: {x: 0, y: 10, z: 0}
   followSpeed: 0
-  deadZoneX: 0
-  deadZoneY: 0
-  returnZonePadding: 0
+  deadZoneX: 0.2
+  deadZoneY: 0.2
+  returnZonePadding: 0.2
   normalFOV: 60
   zoomedFOV: 30
   zoomDuration: 5
@@ -6087,6 +6136,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1157455426}
   - component: {fileID: 1157455427}
+  - component: {fileID: 1157455428}
   m_Layer: 2
   m_Name: World Center
   m_TagString: Pivot
@@ -6210,7 +6260,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotateSpeed: 5
   cameraTransform: {fileID: 0}
-  player: {fileID: 0}
+  areaBounds: {fileID: 0}
+  player: {fileID: 305561642}
+--- !u!65 &1157455428
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1157455425}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 10, y: 10, z: 10}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1219374274
 GameObject:
   m_ObjectHideFlags: 0
@@ -10077,3 +10149,4 @@ SceneRoots:
   - {fileID: 5014122121606880246}
   - {fileID: 1780330475}
   - {fileID: 163362439}
+  - {fileID: 18072879}

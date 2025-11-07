@@ -8,8 +8,16 @@ public class CameraFollow : MonoBehaviour
     [SerializeField] private Vector3 offset = new Vector3(0, 10, 0);
     [SerializeField] private float followSpeed;
 
-    [Header("Dead Zone Settings")] [Range(0f, 0.5f)]
-    [SerializeField] private float deadZoneX, deadZoneY, returnZonePadding;
+    [Header("Dead Zone Settings")]
+    [Range(0f, 0.5f)] [SerializeField]
+    [Tooltip("Range (in viewport%) before the camera starts following")]
+    private float deadZoneX;
+    [Range(0f, 0.5f)] [SerializeField]
+    [Tooltip("Range (in viewport%) before the camera starts following")]
+    private float deadZoneY;
+    [Range(0f, 0.5f)] [SerializeField]
+    [Tooltip("Extra padding inside the dead zone before the camera stops following")]
+    private float returnZonePadding;
 
     [Header("Zoom Settings")] [SerializeField]
     private float normalFOV, zoomedFOV, zoomDuration;
@@ -17,8 +25,9 @@ public class CameraFollow : MonoBehaviour
     private Camera cam;
     private bool isFollowingX;
     private bool isFollowingY;
-
     private Coroutine zoomRoutine;
+
+    private Vector3 originalOffset; // store original offset reference
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -31,6 +40,7 @@ public class CameraFollow : MonoBehaviour
         
         cam = Camera.main;
         cam.fieldOfView = normalFOV;
+        originalOffset = offset;
     }
 
     // Update is called once per frame
@@ -91,16 +101,32 @@ public class CameraFollow : MonoBehaviour
         float endFOV = zoomIn ? zoomedFOV : normalFOV;
         float elapsed = 0f;
 
+        Vector3 startPos = transform.position;
+        Vector3 endPos;
+        
+        if (zoomIn)
+        {
+            // Move closer to player’s XZ, but maintain Y (height)
+            endPos = new Vector3(target.position.x, startPos.y, target.position.z);
+        }
+        else
+        {
+            // Return to player + original offset
+            endPos = target.position + originalOffset;
+        }
+
         while (elapsed < zoomDuration)
         {
             elapsed += Time.deltaTime;
-            float t = elapsed / zoomDuration;
-            t = Mathf.SmoothStep(0f, 1f, t); // adds nice easing
+            float t = Mathf.SmoothStep(0f, 1f, elapsed/zoomDuration); // adds nice easing
+            
             cam.fieldOfView = Mathf.Lerp(startFOV, endFOV, t);
+            transform.position = Vector3.Lerp(startPos, endPos, t);
             yield return null;
         }
 
         cam.fieldOfView = endFOV;
+        transform.position = endPos;
         zoomRoutine = null;
     }
 
@@ -114,15 +140,20 @@ public class CameraFollow : MonoBehaviour
     {
         float startFOV = cam.fieldOfView;
         float time = 0f;
+        
+        Vector3 startPos = transform.position;
+        Vector3 endPos = target.position + originalOffset;
 
         while (time < duration)
         {
             time += Time.deltaTime;
             float t = time / duration;
             cam.fieldOfView = Mathf.Lerp(startFOV, normalFOV, t);
+            transform.position = Vector3.Lerp(startPos, endPos, t);
             yield return null;
         }
 
         cam.fieldOfView = normalFOV; // make sure it ends cleanly
+        transform.position = endPos;
     }
 }

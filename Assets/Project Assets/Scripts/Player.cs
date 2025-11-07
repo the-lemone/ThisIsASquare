@@ -24,7 +24,7 @@ public class Player : MonoBehaviour
     private Rigidbody _rb;
     private Vector3 _moveInput;
     private Vector3 _velocity;
-    private PlayerControls _controls;
+    public PlayerControls _controls;
     
     private Coroutine _selfDestructRoutine;
     private Vector3 _originalPosition;
@@ -69,6 +69,9 @@ public class Player : MonoBehaviour
                 Debug.Log("Self-destruct aborted!");
             }
         }
+
+        if (transform.position.y != 0f)
+            transform.position = new Vector3(transform.position.x, 0f, transform.position.z);
     }
 
     void FixedUpdate()

@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class WorldController : MonoBehaviour
@@ -16,6 +17,8 @@ public class WorldController : MonoBehaviour
     
     private bool canRotateHorizontal;
     private bool canRotateVertical;
+    
+    private bool canMove = true;
 
     void Awake()
     {
@@ -24,7 +27,7 @@ public class WorldController : MonoBehaviour
 #endif
         
         _controls = new PlayerControls();
-
+        
         // Rotations around camera horizontal
         _controls.Player.RotateLeft.performed += _ =>
         {
@@ -64,33 +67,48 @@ public class WorldController : MonoBehaviour
         canRotateHorizontal = PlayerPrefs.GetInt("CanRotateHorizontal", 0) == 1;
         canRotateVertical = PlayerPrefs.GetInt("CanRotateVertical", 0) == 1;
     }
-    
+
     void Update()
     {
-        if (!_isActive || !_isRotating) return;
-        
-        if (_isRotating)
+        if(!canMove)
         {
-            _t += Time.deltaTime * rotateSpeed;
-            transform.rotation = Quaternion.Slerp(_startRotation, _targetRotation, _t);
-
-            if (_t >= 1f)
-                _isRotating = false;
+            player.GetComponent<Player>()._controls.Disable();
+        }
+        else
+        {
+            player.GetComponent<Player>()._controls.Enable();
         }
     }
     
     private void TryRotate(float angle, Vector3 axis)
     {
-        if (_isRotating) return;
-            StartRotation(angle, axis);
+        if (_isRotating || !_isActive) return;
+        StartCoroutine(RotateRoutine(angle, axis));
     }
     
-    private void StartRotation(float angle, Vector3 axis)
+    private IEnumerator RotateRoutine(float angle, Vector3 axis)
     {
+        _isRotating = true;
+        canMove = false;
+
         _startRotation = transform.rotation;
         _targetRotation = Quaternion.AngleAxis(angle, axis) * _startRotation;
-        _t = 0f;
-        _isRotating = true;
+
+        float t = 0f;
+        while (t < 1f)
+        {
+            t += Time.deltaTime * rotateSpeed;
+            transform.rotation = Quaternion.Slerp(_startRotation, _targetRotation, t);
+            yield return null;
+        }
+
+        transform.rotation = _targetRotation; // ensure perfect final rotation
+        _isRotating = false;
+
+        // Small delay after rotation before enabling movement
+        yield return new WaitForSeconds(0.5f);
+
+        canMove = true;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -114,7 +132,6 @@ public class WorldController : MonoBehaviour
     public void SetActive(bool state)
     {
         _isActive = state;
-        
     }
     
     public void UnlockHorizontalRotation()
